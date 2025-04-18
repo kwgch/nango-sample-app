@@ -44,7 +44,7 @@ export const getConnections: RouteHandler<{
       }));
       
       console.log('Formatted connections:', formattedConnections);
-      await reply.status(200).send({ connections: formattedConnections });
+      await reply.status(200).send({ connections: formattedConnections as any });
       return;
     }
     
