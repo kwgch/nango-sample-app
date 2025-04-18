@@ -112,6 +112,12 @@ async function handleSyncWebhook(body: NangoSyncWebhookBody) {
     const avatar =
       record.profile.image_original ??
       'https://placehold.co/32x32/lightgrey/white';
+    
+    const email = record.profile.email;
+    const displayName = record.profile.display_name;
+    const timezone = record.tz;
+    const isAdmin = record.is_admin;
+    const teamId = record.team_id;
 
     // Create or Update the others records
     await db.contacts.upsert({
@@ -123,8 +129,24 @@ async function handleSyncWebhook(body: NangoSyncWebhookBody) {
         integrationId: body.providerConfigKey,
         connectionId: body.connectionId,
         createdAt: new Date(),
+        email,
+        displayName,
+        timezone,
+        isAdmin,
+        teamId,
+
       },
-      update: { fullName, avatar, updatedAt: new Date() },
+      update: { 
+        fullName, 
+        avatar, 
+        updatedAt: new Date(),
+        email,
+        displayName,
+        timezone,
+        isAdmin,
+        teamId,
+
+      },
     });
   }
 

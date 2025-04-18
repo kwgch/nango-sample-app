@@ -27,6 +27,13 @@ model Contacts {
   connectionId  String
   fullName      String
   avatar        String
+  
+  // Additional Slack user information
+  email         String?
+  displayName   String?
+  timezone      String?
+  isAdmin       Boolean? @default(false)
+  teamId        String?
 
   createdAt DateTime? @db.Timestamp(3)
   updatedAt DateTime  @updatedAt
