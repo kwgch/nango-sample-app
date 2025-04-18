@@ -25,21 +25,34 @@ export const IntegrationBloc: React.FC<{
 
     connectUI.current = nango.openConnectUI({
       onEvent: (event) => {
+        console.log('Nango connect event:', event);
         if (event.type === 'close') {
           // we refresh on close so user can see the diff
           void queryClient.refetchQueries({ queryKey: ['connections'] });
+          void queryClient.refetchQueries({ queryKey: ['integrations'] });
+          void queryClient.refetchQueries({ queryKey: ['contacts'] });
           setLoading(false);
         } else if (event.type === 'connect') {
           // The backend will receive a webhook with the connection info
+          console.log('Connection successful, refreshing queries');
           void queryClient.refetchQueries({ queryKey: ['connections'] });
+          void queryClient.refetchQueries({ queryKey: ['integrations'] });
+          void queryClient.refetchQueries({ queryKey: ['contacts'] });
         }
       },
     });
 
     // We defer the token creation so the iframe can open and display a loading screen
     setTimeout(async () => {
-      const res = await postConnectSession();
-      connectUI.current!.setSessionToken(res.connectSession);
+      try {
+        const res = await postConnectSession();
+        console.log('Connect session created:', res);
+        connectUI.current!.setSessionToken(res.connectSession);
+      } catch (err) {
+        console.error('Error creating connect session:', err);
+        setError('Failed to create connect session');
+        setLoading(false);
+      }
     }, 10);
 
     setError(null);

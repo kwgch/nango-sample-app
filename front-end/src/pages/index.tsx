@@ -35,8 +35,11 @@ export default function IndexPage() {
   }, [resIntegrations, resConnections]);
 
   const connectedTo = useMemo(() => {
+    console.log('Connections data:', resConnections);
+    console.log('Integrations data:', resIntegrations);
+    console.log('Mapped integrations:', integrations);
     return integrations?.find((value) => value.connected);
-  }, [integrations]);
+  }, [integrations, resConnections, resIntegrations]);
 
   if (!integrations) {
     return (
