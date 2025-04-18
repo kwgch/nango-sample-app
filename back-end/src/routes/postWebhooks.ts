@@ -17,7 +17,7 @@ export const postWebhooks: RouteHandler = async (req, reply) => {
   const body = req.body as NangoWebhookBody;
   const sig = req.headers['x-nango-signature'] as string;
 
-  console.log('Webhook URL:', process.env['NANGO_WEBHOOK_URL']);
+  console.log('Webhook URL:', process.env['NANGO_WEBHOOK_URL'], 'Webhook type:', body.type);
   console.log('Webhook: received', body);
 
   // Verify the signature to be sure it's Nango that sent us this payload
@@ -68,7 +68,7 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
       console.log('Connection ID:', body.connectionId);
       
       const user = await db.users.findFirst({
-        where: { email: 'john.doe@example.com' }
+        where: {}
       });
       
       if (user) {
