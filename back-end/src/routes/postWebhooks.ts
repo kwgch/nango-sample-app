@@ -17,7 +17,7 @@ export const postWebhooks: RouteHandler = async (req, reply) => {
   const body = req.body as NangoWebhookBody;
   const sig = req.headers['x-nango-signature'] as string;
 
-  console.log('Webhook URL:', process.env.NANGO_WEBHOOK_URL);
+  console.log('Webhook URL:', process.env['NANGO_WEBHOOK_URL']);
   console.log('Webhook: received', body);
 
   // Verify the signature to be sure it's Nango that sent us this payload
