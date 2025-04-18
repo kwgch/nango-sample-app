@@ -63,8 +63,10 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
     console.log('Webhook: New connection', body);
     // With the end user id that we set in the Session, we can now link our user to the new connection
     try {
+      console.log('endUser data:', body.endUser);
+      
       const user = await db.users.findFirst({
-        where: { email: body.endUser?.endUserId || 'john.doe@example.com' }
+        where: { email: 'john.doe@example.com' }
       });
       
       if (user) {
