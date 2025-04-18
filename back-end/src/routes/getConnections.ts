@@ -26,7 +26,9 @@ export const getConnections: RouteHandler<{
   }
 
   // We list all the connections for our user
+  console.log('Listing connections for user:', user);
   const list = await nango.listConnections(user.connectionId);
+  console.log('Connections list:', list);
 
   await reply.status(200).send({ connections: list.connections });
 };
