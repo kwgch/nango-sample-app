@@ -23,13 +23,18 @@ export default function IndexPage() {
       return;
     }
 
+    console.log('Building integrations with connections:', resConnections);
+    
     return resIntegrations.integrations.map((integration) => {
+      const isConnected = resConnections.connections.some((connection) => {
+        return connection.provider_config_key === integration.unique_key;
+      });
+      
+      console.log(`Integration ${integration.unique_key} connected:`, isConnected);
+      
       return {
         ...integration,
-        connected:
-          resConnections.connections.find((connection) => {
-            return connection.provider_config_key === integration.unique_key;
-          }) !== undefined,
+        connected: isConnected,
       };
     });
   }, [resIntegrations, resConnections]);
