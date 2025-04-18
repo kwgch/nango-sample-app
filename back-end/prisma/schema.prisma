@@ -42,3 +42,15 @@ model Contacts {
 
   @@index([integrationId])
 }
+
+// Model for storing connection information
+model Connections {
+  id String @id @db.VarChar(64)
+  
+  provider_config_key String
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([provider_config_key])
+}
