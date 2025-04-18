@@ -35,9 +35,37 @@ export const IntegrationBloc: React.FC<{
         } else if (event.type === 'connect') {
           // The backend will receive a webhook with the connection info
           console.log('Connection successful, refreshing queries');
-          void queryClient.refetchQueries({ queryKey: ['connections'] });
-          void queryClient.refetchQueries({ queryKey: ['integrations'] });
-          void queryClient.refetchQueries({ queryKey: ['contacts'] });
+          
+          const connectionId = event.payload?.connectionId;
+          const providerConfigKey = event.payload?.providerConfigKey;
+          
+          if (connectionId && providerConfigKey) {
+            console.log(`Setting connection for ${providerConfigKey} with ID ${connectionId}`);
+            
+            fetch(`${baseUrl}/connections/manual-create`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                connectionId,
+                providerConfigKey,
+              }),
+            })
+            .then(response => {
+              console.log('Manual connection creation response:', response);
+              void queryClient.refetchQueries({ queryKey: ['connections'] });
+              void queryClient.refetchQueries({ queryKey: ['integrations'] });
+              void queryClient.refetchQueries({ queryKey: ['contacts'] });
+            })
+            .catch(err => {
+              console.error('Error creating manual connection:', err);
+            });
+          } else {
+            void queryClient.refetchQueries({ queryKey: ['connections'] });
+            void queryClient.refetchQueries({ queryKey: ['integrations'] });
+            void queryClient.refetchQueries({ queryKey: ['contacts'] });
+          }
         }
       },
     });
