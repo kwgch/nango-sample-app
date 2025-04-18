@@ -8,7 +8,7 @@ import Spinner from './Spinner';
 import InfoModal from './modals/Info';
 
 const apiURL = process.env.NEXT_PUBLIC_NANGO_HOST ?? 'https://api.nango.dev';
-const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY
+const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY ?? '41df0b15-76dd-482c-a08c-4ce983d1ae5b'
 const nango = new Nango({ host: apiURL, publicKey });
 
 export const IntegrationBloc: React.FC<{
