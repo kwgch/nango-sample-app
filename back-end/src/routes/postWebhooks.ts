@@ -17,6 +17,7 @@ export const postWebhooks: RouteHandler = async (req, reply) => {
   const body = req.body as NangoWebhookBody;
   const sig = req.headers['x-nango-signature'] as string;
 
+  console.log('Webhook URL:', process.env.NANGO_WEBHOOK_URL);
   console.log('Webhook: received', body);
 
   // Verify the signature to be sure it's Nango that sent us this payload
@@ -64,6 +65,7 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
     // With the end user id that we set in the Session, we can now link our user to the new connection
     try {
       console.log('endUser data:', body.endUser);
+      console.log('Connection ID:', body.connectionId);
       
       const user = await db.users.findFirst({
         where: { email: 'john.doe@example.com' }
@@ -71,6 +73,7 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
       
       if (user) {
         console.log('Found user:', user);
+        console.log('Updating user connection ID to:', body.connectionId);
         await db.users.update({
           data: {
             connectionId: body.connectionId,
@@ -79,7 +82,7 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
             email: user.email,
           },
         });
-        console.log('Updated user connection ID to:', body.connectionId);
+        console.log('User connection updated successfully');
       } else {
         console.error('User not found for endUserId:', body.endUser?.endUserId);
       }
