@@ -68,38 +68,36 @@ async function handleNewConnectionWebhook(body: NangoAuthWebhookBody) {
       console.log('Connection ID:', body.connectionId);
       console.log('Provider config key:', body.providerConfigKey);
       
-      // Create a connection record directly in the database
-      await db.$transaction(async (tx) => {
-        const user = await tx.users.findFirst();
+      // Update user and create a connection record
+      const user = await db.users.findFirst();
+      
+      if (user) {
+        console.log('Found user:', user);
+        console.log('Updating user connection ID to:', body.connectionId);
         
-        if (user) {
-          console.log('Found user:', user);
-          console.log('Updating user connection ID to:', body.connectionId);
-          
-          await tx.users.update({
-            data: {
-              connectionId: body.connectionId,
-            },
-            where: {
-              id: user.id,
-            },
-          });
-          
-          // Create a connection record
-          await tx.connections.create({
-            data: {
-              id: body.connectionId,
-              provider_config_key: body.providerConfigKey,
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-          });
-          
-          console.log('User connection and connection record created successfully');
-        } else {
-          console.error('User not found for endUserId:', body.endUser?.endUserId);
-        }
-      });
+        await db.users.update({
+          data: {
+            connectionId: body.connectionId,
+          },
+          where: {
+            id: user.id,
+          },
+        });
+        
+        // Create a connection record
+        await db.connections.create({
+          data: {
+            id: body.connectionId,
+            provider_config_key: body.providerConfigKey,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        });
+        
+        console.log('User connection and connection record created successfully');
+      } else {
+        console.error('User not found for endUserId:', body.endUser?.endUserId);
+      }
     } catch (error) {
       console.error('Error updating user connection:', error);
     }
