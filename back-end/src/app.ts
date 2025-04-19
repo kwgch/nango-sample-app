@@ -8,6 +8,7 @@ import { getConnections } from './routes/getConnections.js';
 import { deleteConnection } from './routes/deleteConnection.js';
 import { sendSlackMessage } from './routes/sendSlackMessage.js';
 import { postConnectSession } from './routes/postConnectSession.js';
+import { postManualConnection } from './routes/postManualConnection.js';
 import { seedUser } from './db.js';
 
 const fastify = Fastify({ logger: false });
@@ -61,6 +62,11 @@ fastify.get('/contacts', getContacts);
  * Send a Slack message to a given Slack user.
  */
 fastify.post('/send-slack-message', sendSlackMessage);
+
+/**
+ * Create a manual connection record when webhooks aren't working
+ */
+fastify.post('/connections/manual-create', postManualConnection);
 
 try {
   await seedUser();

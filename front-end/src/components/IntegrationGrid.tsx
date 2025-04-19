@@ -8,7 +8,7 @@ import Spinner from './Spinner';
 import InfoModal from './modals/Info';
 
 const apiURL = process.env.NEXT_PUBLIC_NANGO_HOST ?? 'https://api.nango.dev';
-const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY
+const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY ?? '';
 const nango = new Nango({ host: apiURL, publicKey });
 
 export const IntegrationBloc: React.FC<{
@@ -25,21 +25,62 @@ export const IntegrationBloc: React.FC<{
 
     connectUI.current = nango.openConnectUI({
       onEvent: (event) => {
+        console.log('Nango connect event:', event);
         if (event.type === 'close') {
           // we refresh on close so user can see the diff
           void queryClient.refetchQueries({ queryKey: ['connections'] });
+          void queryClient.refetchQueries({ queryKey: ['integrations'] });
+          void queryClient.refetchQueries({ queryKey: ['contacts'] });
           setLoading(false);
         } else if (event.type === 'connect') {
           // The backend will receive a webhook with the connection info
-          void queryClient.refetchQueries({ queryKey: ['connections'] });
+          console.log('Connection successful, refreshing queries');
+          
+          const connectionId = event.payload?.connectionId;
+          const providerConfigKey = event.payload?.providerConfigKey;
+          
+          if (connectionId && providerConfigKey) {
+            console.log(`Setting connection for ${providerConfigKey} with ID ${connectionId}`);
+            
+            fetch(`${baseUrl}/connections/manual-create`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                connectionId,
+                providerConfigKey,
+              }),
+            })
+            .then(response => {
+              console.log('Manual connection creation response:', response);
+              void queryClient.refetchQueries({ queryKey: ['connections'] });
+              void queryClient.refetchQueries({ queryKey: ['integrations'] });
+              void queryClient.refetchQueries({ queryKey: ['contacts'] });
+            })
+            .catch(err => {
+              console.error('Error creating manual connection:', err);
+            });
+          } else {
+            void queryClient.refetchQueries({ queryKey: ['connections'] });
+            void queryClient.refetchQueries({ queryKey: ['integrations'] });
+            void queryClient.refetchQueries({ queryKey: ['contacts'] });
+          }
         }
       },
     });
 
     // We defer the token creation so the iframe can open and display a loading screen
     setTimeout(async () => {
-      const res = await postConnectSession();
-      connectUI.current!.setSessionToken(res.connectSession);
+      try {
+        const res = await postConnectSession();
+        console.log('Connect session created:', res);
+        connectUI.current!.setSessionToken(res.connectSession);
+      } catch (err) {
+        console.error('Error creating connect session:', err);
+        setError('Failed to create connect session');
+        setLoading(false);
+      }
     }, 10);
 
     setError(null);

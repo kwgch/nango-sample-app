@@ -14,5 +14,5 @@ export async function seedUser() {
 }
 
 export async function getUserFromDatabase() {
-  return await db.users.findFirst({ where: { email: 'john.doe@example.com' } });
+  return await db.users.findFirst();
 }

@@ -27,6 +27,13 @@ model Contacts {
   connectionId  String
   fullName      String
   avatar        String
+  
+  // Additional Slack user information
+  email         String?
+  displayName   String?
+  timezone      String?
+  isAdmin       Boolean? @default(false)
+  teamId        String?
 
   createdAt DateTime? @db.Timestamp(3)
   updatedAt DateTime  @updatedAt
@@ -34,4 +41,16 @@ model Contacts {
   deletedAt DateTime? @db.Timestamp(3)
 
   @@index([integrationId])
+}
+
+// Model for storing connection information
+model Connections {
+  id String @id @db.VarChar(64)
+  
+  provider_config_key String
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([provider_config_key])
 }
